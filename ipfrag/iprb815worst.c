@@ -61,10 +61,10 @@ int main(int argc, char **argv)
     rb815ctx_init_fast(&ctx);
     for (i = 0; i < 65535-14-20; i += 16)
     {
-      fragment[0].datastart = i;
+      fragment[0].datastart = (uint16_t)i;
       fragment[0].datalen = 8;
       fragment[0].pkt = NULL;
-      if (fragment4(&intf, pkt, sz, fragment, 1) != 0)
+      if (fragment4(&intf, pkt, (uint16_t)sz, fragment, 1) != 0)
       {
         abort();
       }
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     }
   }
   end = gettime64();
-  printf("%g MPPS\n", pktcnt*1.0/(end-begin));
+  printf("%g MPPS\n", (double)pktcnt*1.0/(double)(end-begin));
 
   ll_alloc_st_free(&st);
   

@@ -10,7 +10,7 @@ int main(int argc, char **argv)
   port_list_init(&list);
   for (i = 1024; i < 65536; i++)
   {
-    port_list_add(&list, i);
+    port_list_add(&list, (uint16_t)i);
   }
   for (i = 0; i < 10*1000*1000; i++)
   {

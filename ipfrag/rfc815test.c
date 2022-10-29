@@ -54,9 +54,9 @@ int main(int argc, char **argv)
   fragment[0].datalen = 1514 - 14 - 20;
   fragment[0].pkt = NULL;
   fragment[1].datastart = 1514 - 14 - 20;
-  fragment[1].datalen = sz - 14 - 20 - (1514 - 14 - 20);
+  fragment[1].datalen = (uint16_t)(sz - 14 - 20 - (1514 - 14 - 20));
   fragment[1].pkt = NULL;
-  if (fragment4(&intf, pkt, sz, fragment, 2) != 0)
+  if (fragment4(&intf, pkt, (uint16_t)sz, fragment, 2) != 0)
   {
     abort();
   }
@@ -145,17 +145,17 @@ int main(int argc, char **argv)
     i = 0;
     for (;;)
     {
-      fragment[0].datastart = (((uint32_t)rand() % (sz - 14 - 20)) >> 3) << 3;
+      fragment[0].datastart = (uint16_t)((((uint32_t)rand() % (sz - 14 - 20)) >> 3) << 3);
       if (rand() % 2)
       {
         fragment[0].datalen = 0;
       }
       else
       {
-        fragment[0].datalen = 1 + ((uint32_t)rand() % (sz - 14 - 20 - fragment[0].datastart));
+        fragment[0].datalen = (uint16_t)(1 + ((uint32_t)rand() % (sz - 14 - 20 - fragment[0].datastart)));
       }
       fragment[0].pkt = NULL;
-      if (fragment4(&intf, pkt, sz, fragment, 1) != 0)
+      if (fragment4(&intf, pkt, (uint16_t)sz, fragment, 1) != 0)
       {
         abort();
       }

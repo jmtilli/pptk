@@ -50,9 +50,9 @@ int main(int argc, char **argv)
     {
       uint64_t pdiff = pkts - last_pkts;
       uint64_t bdiff = bytes - last_bytes;
-      double tdiff = time64 - last_time64;
+      double tdiff = (double)(time64 - last_time64);
       printf("%g MPPS %g Gbps\n",
-             pdiff/tdiff, bdiff*8/1000/tdiff);
+             (double)pdiff/tdiff, (double)bdiff*8/1000/tdiff);
       last_time64 = time64;
       last_pkts = pkts;
       last_bytes = bytes;

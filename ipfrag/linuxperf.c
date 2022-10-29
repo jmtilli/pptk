@@ -72,11 +72,11 @@ int main(int argc, char **argv)
     fragment[0].datalen = 1514 - 14 - 20;
     fragment[0].pkt = NULL;
     fragment[1].datastart = 1514 - 14 - 20;
-    fragment[1].datalen = sz - 14 - 20 - (1514 - 14 - 20);
-    fragment[1].datastart -= 8; // FIXME rm
-    fragment[1].datalen += 8; // FIXME rm
+    fragment[1].datalen = (uint16_t)(sz - 14 - 20 - (1514 - 14 - 20));
+    fragment[1].datastart = (uint16_t)(fragment[1].datastart - 8); // FIXME rm
+    fragment[1].datalen = (uint16_t)(fragment[1].datalen + 8); // FIXME rm
     fragment[1].pkt = NULL;
-    if (fragment4(&intf, pkt, sz, fragment, 2) != 0)
+    if (fragment4(&intf, pkt, (uint16_t)sz, fragment, 2) != 0)
     {
       abort();
     }
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     ipq_free(&intf, &ipq);
   }
   end = gettime64();
-  printf("%g MPPS\n", 20e6/(end-begin));
+  printf("%g MPPS\n", 20e6/(double)(end-begin));
 
   ll_alloc_st_free(&st);
    

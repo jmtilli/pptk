@@ -25,8 +25,8 @@ static inline uint32_t random_mt(struct random_mt_ctx *ctx)
   }
   y = ctx->mt[ctx->index];
   y = y ^ (y>>11);
-  y = y ^ ((y<<7) & 2636928640);
-  y = y ^ ((y<<15) & 4022730752);
+  y = y ^ ((y<<7) & 2636928640U);
+  y = y ^ ((y<<15) & 4022730752U);
   y = y ^ (y>>18);
   ctx->index++;
   return y;

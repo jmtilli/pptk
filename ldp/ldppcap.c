@@ -26,7 +26,7 @@ static uint32_t ldp_in_queue_ring_size_pcap(struct ldp_in_queue *inq)
 {
   struct ldp_in_queue_pcap *inpcap;
   inpcap = CONTAINER_OF(inq, struct ldp_in_queue_pcap, q);
-  return inpcap->num_bufs;
+  return (uint32_t)inpcap->num_bufs;
 }
 
 struct ldp_out_queue_pcap {
@@ -259,7 +259,7 @@ static void ldp_in_queue_intern(struct ldp_in_queue_pcap *inq,
   {
     min = snap;
   }
-  int amnt_free = inq->buf_end - inq->buf_start - 1;
+  int amnt_free = (int)(inq->buf_end - inq->buf_start - 1);
   if (amnt_free < 0)
   {
     if (inq->num_bufs > INT_MAX)
@@ -290,7 +290,7 @@ static void ldp_in_queue_intern(struct ldp_in_queue_pcap *inq,
   }
   memcpy(inq->bufs[inq->buf_start], buf, min);
   pkt->data = inq->bufs[inq->buf_start];
-  pkt->sz = min;
+  pkt->sz = (uint32_t)min;
   pkt->ancillarysz = inq->bufcapacities[inq->buf_start];
   inq->buf_start++;
   if (inq->buf_start >= inq->num_bufs)
@@ -332,7 +332,7 @@ static int ldp_in_queue_nextpkts_ts_pcap(struct ldp_in_queue *inq,
     return 0;
   }
 
-  amnt_free = inpcapq->buf_end - inpcapq->buf_start - 1;
+  amnt_free = (int)(inpcapq->buf_end - inpcapq->buf_start - 1);
   if (amnt_free < 0)
   {
     if (inpcapq->num_bufs > INT_MAX)

@@ -349,7 +349,7 @@ void ldp_config_init(struct ldp_config *config)
   }
   if (getenv("LDP_DPDK_NB_RXD"))
   {
-    config->dpdk_nb_rxd = atoi(getenv("LDP_DPDK_NB_RXD"));
+    config->dpdk_nb_rxd = (uint16_t)atoi(getenv("LDP_DPDK_NB_RXD"));
   }
   else
   {
@@ -357,7 +357,7 @@ void ldp_config_init(struct ldp_config *config)
   }
   if (getenv("LDP_DPDK_NB_TXD"))
   {
-    config->dpdk_nb_txd = atoi(getenv("LDP_DPDK_NB_TXD"));
+    config->dpdk_nb_txd = (uint16_t)atoi(getenv("LDP_DPDK_NB_TXD"));
   }
   else
   {
@@ -448,7 +448,7 @@ static uint32_t ldp_in_queue_ring_size_socket(struct ldp_in_queue *inq)
 {
   struct ldp_in_queue_socket *insock;
   insock = CONTAINER_OF(inq, struct ldp_in_queue_socket, q);
-  return insock->num_bufs;
+  return (uint32_t)insock->num_bufs;
 }
 
 struct ldp_out_queue_socket {
@@ -549,7 +549,7 @@ static int ldp_in_queue_nextpkts_socket(struct ldp_in_queue *inq,
 
 
   // FIXME this calculation needs to be checked
-  amnt_free = insock->buf_end - insock->buf_start - 1;
+  amnt_free = (int)(insock->buf_end - insock->buf_start - 1);
   if (amnt_free < 0)
   {
     if (insock->num_bufs > INT_MAX)
@@ -623,8 +623,8 @@ static int ldp_in_queue_nextpkts_socket(struct ldp_in_queue *inq,
     j++;
   }
   insock->buf_start = k;
-  ldp_in_queue_deallocate_some_socket(inq, missed, l);
-  return j;
+  ldp_in_queue_deallocate_some_socket(inq, missed, (int)l);
+  return (int)j;
 }
 
 static int ldp_out_queue_inject_socket(struct ldp_out_queue *outq,

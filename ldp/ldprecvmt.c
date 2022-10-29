@@ -44,9 +44,9 @@ static void *thrfn(void *arg)
     {
       uint64_t pdiff = pkts - last_pkts;
       uint64_t bdiff = bytes - last_bytes;
-      double tdiff = time64 - last_time64;
+      double tdiff = (double)(time64 - last_time64);
       printf("thread %d: %g MPPS %g Gbps\n", id,
-             pdiff/tdiff, bdiff*8/1000/tdiff);
+             (double)pdiff/tdiff, (double)bdiff*8/1000/tdiff);
       last_time64 = time64;
       last_pkts = pkts;
       last_bytes = bytes;
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  intf = ldp_interface_open(argv[2], num_thr, num_thr);
+  intf = ldp_interface_open(argv[2], (int)num_thr, (int)num_thr);
   if (intf == NULL)
   {
     printf("cannot open %s\n", argv[2]);
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 
   for (i = 0; i < num_thr; i++)
   {
-    ctx[i].id = i;
+    ctx[i].id = (int)i;
     pthread_create(&pth[i], NULL, thrfn, &ctx[i]);
   }
   for (i = 0; i < num_thr; i++)

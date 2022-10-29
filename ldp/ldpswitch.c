@@ -39,7 +39,7 @@ struct entry {
 
 static inline uint32_t mac_hash(const char mac[6])
 {
-  return siphash_buf(hash_seed_get(), mac, 6);
+  return (uint32_t)siphash_buf(hash_seed_get(), mac, 6);
 }
 
 static inline uint32_t hash(struct entry *e)
@@ -184,7 +184,7 @@ static void port_put(const char mac[6], int port, uint64_t time64)
       goto out;
     }
     memcpy(e2->mac, mac, 6);
-    e2->bucket = (hashval & (table.bucketcnt - 1));
+    e2->bucket = (uint32_t)(hashval & (table.bucketcnt - 1));
     e2->port = port;
     e2->time64 = time64;
     linked_list_add_tail(&e2->n, &oldest_to_newest);
@@ -283,7 +283,7 @@ static void *thrfn(void *arg)
           {
             if (!fast_mac_equals(src, last_mac))
             {
-              port_put(src, i, time64);
+              port_put(src, (int)i, time64);
               memcpy(last_mac, src, 6);
             }
           }
@@ -379,12 +379,12 @@ int main(int argc, char **argv)
 
   for (i = 0; i < num_intfs; i++)
   {
-    intfs[i] = ldp_interface_open(argv[2+i], num_thrs, num_thrs);
+    intfs[i] = ldp_interface_open(argv[2+i], (int)num_thrs, (int)num_thrs);
   }
 
   for (i = 0; i < num_thrs; i++)
   {
-    thrctxs[i].id = i;
+    thrctxs[i].id = (int)i;
     pthread_create(&thrs[i], NULL, thrfn, &thrctxs[i]);
   }
   for (i = 0; i < num_thrs; i++)

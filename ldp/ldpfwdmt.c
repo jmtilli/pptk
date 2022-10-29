@@ -55,11 +55,11 @@ static void *thr(void *arg)
       uint64_t dlpdiff = dlpkts - last_dlpkts;
       uint64_t ulbdiff = ulbytes - last_ulbytes;
       uint64_t dlbdiff = dlbytes - last_dlbytes;
-      double tdiff = time64 - last_time64;
+      double tdiff = (double)(time64 - last_time64);
       printf("thread/%d: %g MPPS %g Gbps ul, %g MPPS %g Gbps dl\n",
              thrid,
-             ulpdiff/tdiff, ulbdiff*8/1000/tdiff,
-             dlpdiff/tdiff, dlbdiff*8/1000/tdiff);
+             (double)ulpdiff/tdiff, (double)ulbdiff*8/1000/tdiff,
+             (double)dlpdiff/tdiff, (double)dlbdiff*8/1000/tdiff);
       last_time64 = time64;
       last_ulpkts = ulpkts;
       last_dlpkts = dlpkts;

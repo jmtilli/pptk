@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     allocif_free(&intf, block);
   }
   end = gettime64();
-  printf("%g MPPS indirect\n", 1e8/(end-begin));
+  printf("%g MPPS indirect\n", 1e8/(double)(end-begin));
 
   begin = gettime64();
   for (i = 0; i < 100*1000*1000; i++)
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     ll_free_st(&st, block);
   }
   end = gettime64();
-  printf("%g MPPS direct\n", 1e8/(end-begin));
+  printf("%g MPPS direct\n", 1e8/(double)(end-begin));
 
   ll_alloc_st_free(&st);
 

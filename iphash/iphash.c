@@ -52,7 +52,7 @@ void ip_hash_init(struct ip_hash *hash, struct timer_linkheap *heap,
     for (i = 0; i < hash->hash_size; i++)
     {
       struct ip_hash_entry_tiny *e = &hash->u.entries_tiny[i];
-      e->tokens = hash->initial_tokens;
+      e->tokens = (uint8_t)hash->initial_tokens;
     }
   }
   else if (use_small(hash))
@@ -61,7 +61,7 @@ void ip_hash_init(struct ip_hash *hash, struct timer_linkheap *heap,
     for (i = 0; i < hash->hash_size; i++)
     {
       struct ip_hash_entry_small *e = &hash->u.entries_small[i];
-      e->tokens = hash->initial_tokens;
+      e->tokens = (uint16_t)hash->initial_tokens;
     }
   }
   else
@@ -116,8 +116,8 @@ int ipv6_permitted(
   toset = (128U - bits)/8;
   tomask = (128U - bits)%8;
   memset(src_net + 16 - toset, 0, toset);
-  src_net[16-toset-1] &= ~((1<<tomask) - 1);
-  hashval = siphash_buf(hash_seed_get(), src_net, 16)&(hash->hash_size - 1);
+  src_net[16-toset-1] &= (char)(uint8_t)~((1<<tomask) - 1);
+  hashval = (uint32_t)siphash_buf(hash_seed_get(), src_net, 16)&(hash->hash_size - 1);
 
   if (use_tiny(hash))
   {
@@ -159,7 +159,7 @@ int ip_permitted(
 {
   uint32_t bitmask = (~((1U<<(32-bits))-1U)) & 0xFFFFFFFFU;
   uint32_t network = src_ip & bitmask;
-  uint32_t hashval = siphash64(hash_seed_get(), network)&(hash->hash_size - 1);
+  uint32_t hashval = (uint32_t)siphash64(hash_seed_get(), network)&(hash->hash_size - 1);
 
   if (use_tiny(hash))
   {
@@ -207,8 +207,8 @@ void ipv6_increment_one(
   toset = (128U - bits)/8;
   tomask = (128U - bits)%8;
   memset(src_net + 16 - toset, 0, toset);
-  src_net[16-toset-1] &= ~((1<<tomask) - 1);
-  hashval = siphash_buf(hash_seed_get(), src_net, 16)&(hash->hash_size - 1);
+  src_net[16-toset-1] &= (char)(uint8_t)~((1<<tomask) - 1);
+  hashval = (uint32_t)siphash_buf(hash_seed_get(), src_net, 16)&(hash->hash_size - 1);
 
   if (use_tiny(hash))
   {
@@ -250,7 +250,7 @@ void ip_increment_one(
 {
   uint32_t bitmask = (~((1U<<(32-bits))-1U)) & 0xFFFFFFFFU;
   uint32_t network = src_ip & bitmask;
-  uint32_t hashval = siphash64(hash_seed_get(), network)&(hash->hash_size - 1);
+  uint32_t hashval = (uint32_t)siphash64(hash_seed_get(), network)&(hash->hash_size - 1);
 
   if (use_tiny(hash))
   {
@@ -310,7 +310,7 @@ static void batch_timer_fn(
       {
         tokens = initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint8_t)tokens;
     }
   }
   else if (use_small(args->hash))
@@ -324,7 +324,7 @@ static void batch_timer_fn(
       {
         tokens = initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else

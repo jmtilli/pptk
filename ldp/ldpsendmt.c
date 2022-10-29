@@ -155,7 +155,7 @@ static void construct_packet(char *data, size_t sz)
   ip = ether_payload(data);
   ip_set_version(ip, 4);
   ip46_set_min_hdr_len(ip);
-  ip46_set_payload_len(ip, global_opts.payload_size + 8);
+  ip46_set_payload_len(ip, (uint16_t)(global_opts.payload_size + 8));
   ip46_set_dont_frag(ip, 1);
   ip46_set_id(ip, 0);
   ip46_set_ttl(ip, 64);
@@ -166,8 +166,8 @@ static void construct_packet(char *data, size_t sz)
   udp = ip46_payload(ip);
   udp_set_src_port(udp, global_opts.src_port);
   udp_set_dst_port(udp, global_opts.dst_port);
-  udp_set_total_len(udp, global_opts.payload_size + 8);
-  udp_set_cksum_calc(ip, 20, udp, global_opts.payload_size + 8);
+  udp_set_total_len(udp, (uint16_t)(global_opts.payload_size + 8));
+  udp_set_cksum_calc(ip, 20, udp, (uint16_t)(global_opts.payload_size + 8));
 }
 
 static void usage(const char *argv0)
@@ -210,16 +210,16 @@ static void *thrfn(void *arg)
   for (i = 0; i < global_opts.burst_size; i++)
   {
     pkt_tbl[i].data = pkt;
-    pkt_tbl[i].sz = global_opts.payload_size + 8 + 20 + 14;
+    pkt_tbl[i].sz = (uint32_t)(global_opts.payload_size + 8 + 20 + 14);
   }
 
   while (global_opts.num_pkt <= 0 || pkts <= (size_t)global_opts.num_pkt)
   {
     int num;
-    int left = global_opts.burst_size;
+    int left = (int)global_opts.burst_size;
     if (global_opts.num_pkt && left > (int)(global_opts.num_pkt - pkts))
     {
-      left = global_opts.num_pkt - pkts;
+      left = (int)(global_opts.num_pkt - pkts);
     }
     if (left == 0)
     {
@@ -239,9 +239,9 @@ static void *thrfn(void *arg)
     {
       uint64_t pdiff = pkts - last_pkts;
       uint64_t bdiff = bytes - last_bytes;
-      double tdiff = time64 - last_time64;
+      double tdiff = (double)(time64 - last_time64);
       printf("thread %d: %g MPPS %g Gbps\n", id,
-             pdiff/tdiff, bdiff*8/1000/tdiff);
+             (double)pdiff/tdiff, (double)bdiff*8/1000/tdiff);
       last_time64 = time64;
       last_pkts = pkts;
       last_bytes = bytes;
@@ -325,7 +325,7 @@ int main(int argc, char **argv)
         {
           usage(argv[0]);
         }
-        global_opts.src_port = uli;
+        global_opts.src_port = (uint16_t)uli;
         break;
       case 'n':
         uli = strtoul(optarg, &endptr, 10);
@@ -333,7 +333,7 @@ int main(int argc, char **argv)
         {
           usage(argv[0]);
         }
-        global_opts.dst_port = uli;
+        global_opts.dst_port = (uint16_t)uli;
         break;
       case 'i':
         uli = strtoul(optarg, &endptr, 10);
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
         {
           usage(argv[0]);
         }
-        global_opts.interval_usec = uli;
+        global_opts.interval_usec = (int)uli;
         break;
       case 'c':
         uli = strtoul(optarg, &endptr, 10);
@@ -404,7 +404,7 @@ int main(int argc, char **argv)
     usage(argv[0]);
   }
 
-  intf = ldp_interface_open(argv[optind], global_opts.num_thr, global_opts.num_thr);
+  intf = ldp_interface_open(argv[optind], (int)global_opts.num_thr, (int)global_opts.num_thr);
   if (intf == NULL)
   {
     printf("cannot open %s\n", argv[optind]);
@@ -413,7 +413,7 @@ int main(int argc, char **argv)
 
   for (i = 0; i < global_opts.num_thr; i++)
   {
-    ctx[i].id = i;
+    ctx[i].id = (int)i;
     pthread_create(&pth[i], NULL, thrfn, &ctx[i]);
   }
   for (i = 0; i < global_opts.num_thr; i++)

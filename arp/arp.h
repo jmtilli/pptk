@@ -24,7 +24,7 @@ void arp_entry_expiry_fn(struct timer_link *timer, struct timer_linkheap *heap, 
 
 static inline uint32_t ip_hash(uint32_t ip)
 {
-  return siphash64(hash_seed_get(), ip);
+  return (uint32_t)siphash64(hash_seed_get(), ip);
 }
 
 static inline uint32_t arp_entry_hash(struct arp_entry *e)

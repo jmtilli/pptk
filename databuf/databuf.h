@@ -105,14 +105,14 @@ static inline int datainbuf_get_u32(struct datainbuf *buf, uint32_t *u32ptr)
 
 static inline int datainbuf_get_u16(struct datainbuf *buf, uint16_t *u16ptr)
 {
-  uint32_t u16 = 0;
+  uint16_t u16 = 0;
   if (buf->location + 2 > buf->size)
   {
     return -EFAULT;
   }
-  u16 |= (uint8_t)buf->buf[buf->location++];
-  u16 <<= 8;
-  u16 |= (uint8_t)buf->buf[buf->location++];
+  u16 |= (uint16_t)(uint8_t)buf->buf[buf->location++];
+  u16 = (uint16_t)(u16 << 8);
+  u16 |= (uint16_t)(uint8_t)buf->buf[buf->location++];
   *u16ptr = u16;
   return 0;
 }

@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     random_mt_bytes(&ctx, bytes, sizeof(bytes));
   }
   gettimeofday(&tv2, NULL);
-  diff = tv2.tv_sec - tv1.tv_sec + (tv2.tv_usec - tv1.tv_usec)/1000.0/1000.0;
+  diff = (double)(tv2.tv_sec - tv1.tv_sec) + (double)(tv2.tv_usec - tv1.tv_usec)/1000.0/1000.0;
   printf("%g Gbps\n", 8*100000*sizeof(bytes)/diff/1e9);
   return 0;
 }

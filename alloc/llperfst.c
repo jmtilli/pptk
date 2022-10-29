@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     {
       double diff;
       gettimeofday(&tv2, NULL);
-      diff = tv2.tv_sec - tv1.tv_sec + (tv2.tv_usec - tv1.tv_usec)/1000.0/1000.0;
+      diff = (double)(tv2.tv_sec - tv1.tv_sec) + (double)(tv2.tv_usec - tv1.tv_usec)/1000.0/1000.0;
       tv1 = tv2;
       printf("%g Mpps\n", 16*1024*1024/diff/1e6);
       exit(0);

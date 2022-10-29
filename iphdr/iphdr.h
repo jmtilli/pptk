@@ -4,6 +4,8 @@
 #include "hdr.h"
 #include "dnshdr.h"
 #include <stdlib.h>
+#include <stdint.h>
+#include <limits.h>
 
 #define PCP_RCODE_SUCCESS 0
 #define PCP_RCODE_UNSUPP_VERSION 1
@@ -42,18 +44,18 @@ static inline uint8_t pcp_r(const void *vpkt)
 static inline void pcp_set_r(void *vpkt, int val)
 {
   unsigned char *pkt = vpkt;
-  pkt[1] &= ~(1<<7);
-  pkt[1] |= (!!val)<<7;
+  pkt[1] &= (uint8_t)~(1<<7);
+  pkt[1] = (uint8_t)(pkt[1] | ((!!val)<<7));
 }
 static inline uint8_t pcp_opcode(const void *vpkt)
 {
   const unsigned char *pkt = vpkt;
-  return pkt[1] & ~(1<<7);
+  return pkt[1] & (uint8_t)~(1<<7);
 }
 static inline void pcp_set_opcode(void *vpkt, uint8_t opcode)
 {
   unsigned char *pkt = vpkt;
-  pkt[1] |= opcode & ~(1<<7);
+  pkt[1] = (uint8_t)(pkt[1] | (opcode & (uint8_t)~(1<<7)));
 }
 static inline void pcp_req_set_reserved(void *vpkt, uint16_t val)
 {
@@ -451,9 +453,9 @@ static inline void ipv6_set_traffic_class(void *pkt, uint8_t cls)
   char *cpkt = pkt;
   uint8_t ch;
   ch = hdr_get8h(&cpkt[0]);
-  hdr_set8h(&cpkt[0], (ch&0xF0) | (cls>>4));
+  hdr_set8h(&cpkt[0], (uint8_t)((ch&0xF0) | (cls>>4)));
   ch = hdr_get8h(&cpkt[1]);
-  hdr_set8h(&cpkt[1], (ch&0x0F) | ((cls&0xF) << 4));
+  hdr_set8h(&cpkt[1], (uint8_t)((ch&0x0F) | ((cls&0xF) << 4)));
 }
 
 static inline void ipv6_set_flow_label(void *pkt, uint32_t fl)
@@ -461,7 +463,7 @@ static inline void ipv6_set_flow_label(void *pkt, uint32_t fl)
   char *cpkt = pkt;
   uint8_t ch;
   ch = hdr_get8h(&cpkt[1]);
-  hdr_set8h(&cpkt[1], (ch&0xF0) | ((fl>>16)&0xF));
+  hdr_set8h(&cpkt[1], (uint8_t)((ch&0xF0) | ((fl>>16)&0xF)));
   hdr_set16n(&cpkt[2], fl&0xFFFF);
 }
 
@@ -745,10 +747,10 @@ static inline void *ipv6_proto_hdr_2(
   unsigned char *cipv6 = ipv6;
   uint16_t plen = ipv6_payload_len(ipv6);
   uint32_t tlen = plen + 40U;
-  uint16_t off = 40;
+  uint32_t off = 40;
   uint8_t nexthdr = ipv6_nexthdr(ipv6);
   int is_fragmented = 0;
-  uint16_t frag_hdr_off = 0;
+  uint32_t frag_hdr_off = 0;
   while (is_ipv6_nexthdr(nexthdr))
   {
     uint32_t extlen;
@@ -785,11 +787,11 @@ static inline void *ipv6_proto_hdr_2(
   {
     if (frag_hdr_off_ptr)
     {
-      *frag_hdr_off_ptr = frag_hdr_off;
+      *frag_hdr_off_ptr = (uint16_t)frag_hdr_off; // XXX overflow?
     }
     if (proto_hdr_off_from_frag)
     {
-      *proto_hdr_off_from_frag = off - frag_hdr_off;
+      *proto_hdr_off_from_frag = (uint16_t)(off - frag_hdr_off); // XXX overflow
     }
   }
   return &cipv6[off];
@@ -809,10 +811,10 @@ static inline const void *ipv6_const_proto_hdr_2(
   const unsigned char *cipv6 = ipv6;
   uint16_t plen = ipv6_payload_len(ipv6);
   uint32_t tlen = plen + 40U;
-  uint16_t off = 40;
+  uint32_t off = 40;
   uint8_t nexthdr = ipv6_nexthdr(ipv6);
   int is_fragmented = 0;
-  uint16_t frag_hdr_off = 0;
+  uint32_t frag_hdr_off = 0;
   while (is_ipv6_nexthdr(nexthdr))
   {
     uint32_t extlen;
@@ -849,11 +851,11 @@ static inline const void *ipv6_const_proto_hdr_2(
   {
     if (frag_hdr_off_ptr)
     {
-      *frag_hdr_off_ptr = frag_hdr_off;
+      *frag_hdr_off_ptr = (uint16_t)frag_hdr_off; // XXX overflow
     }
     if (proto_hdr_off_from_frag)
     {
-      *proto_hdr_off_from_frag = off - frag_hdr_off;
+      *proto_hdr_off_from_frag = (uint16_t)(off - frag_hdr_off); // XXX overflow
     }
   }
   return &cipv6[off];
@@ -868,15 +870,15 @@ static inline void ip_set_version(void *pkt, uint8_t version)
 {
   unsigned char *cpkt = pkt;
   unsigned char uch = cpkt[0];
-  uch &= ~0xF0;
-  uch |= (version & 0xF) << 4;
+  uch &= (uint8_t)~0xF0;
+  uch |= (uint8_t)((version & 0xF) << 4);
   cpkt[0] = uch;
 }
 
 static inline uint8_t ip_hdr_len(const void *pkt)
 {
   const char *cpkt = pkt;
-  return ((hdr_get8h(&cpkt[0]))&0xF)*4;
+  return (uint8_t)(((hdr_get8h(&cpkt[0]))&0xF)*4);
 }
 
 static inline uint8_t ip46_hdr_len(const void *pkt)
@@ -901,8 +903,8 @@ static inline void ip_set_hdr_len(void *pkt, uint8_t hdr_len)
     abort();
   }
   hdr_len /= 4;
-  uch &= ~0xF;
-  uch |= hdr_len & 0xF;
+  uch &= (uint8_t)~0xF;
+  uch = (uint8_t)(uch | (hdr_len & 0xF));
   cpkt[0] = uch;
 }
 
@@ -964,7 +966,7 @@ static inline void ip46_set_total_len(void *pkt, uint16_t total_len)
     {
       abort();
     }
-    ipv6_set_payload_len(pkt, total_len - 40);
+    ipv6_set_payload_len(pkt, (uint16_t)(total_len - 40));
   }
   else
   {
@@ -972,11 +974,16 @@ static inline void ip46_set_total_len(void *pkt, uint16_t total_len)
   }
 }
 
+// Careful! Caller has to ensure that payload_len is at most 65515
 static inline void ip46_set_payload_len(void *pkt, uint16_t payload_len)
 {
+  if (payload_len + 20 > UINT16_MAX)
+  {
+    abort();
+  }
   if (ip_version(pkt) == 4)
   {
-    ip_set_total_len(pkt, payload_len + 20);
+    ip_set_total_len(pkt, (uint16_t)(payload_len + 20));
   }
   else if (ip_version(pkt) == 6)
   {
@@ -988,7 +995,7 @@ static inline void ip46_set_payload_len(void *pkt, uint16_t payload_len)
   }
 }
 
-static inline uint16_t ip46_total_len(const void *pkt)
+static inline uint32_t ip46_total_len(const void *pkt)
 {
   if (ip_version(pkt) == 4)
   {
@@ -996,7 +1003,7 @@ static inline uint16_t ip46_total_len(const void *pkt)
   }
   else if (ip_version(pkt) == 6)
   {
-    return ipv6_payload_len(pkt) + 40;
+    return ipv6_payload_len(pkt) + 40U;
   }
   else
   {
@@ -1004,7 +1011,8 @@ static inline uint16_t ip46_total_len(const void *pkt)
   }
 }
 
-static inline uint16_t ip46_payload_len(const void *pkt)
+// Note! Invalid packets may yield negative values.
+static inline int32_t ip46_payload_len(const void *pkt)
 {
   if (ip_version(pkt) == 4)
   {
@@ -1032,8 +1040,8 @@ static inline void ip_set_more_frags(void *pkt, int bit)
   uint8_t u8;
   bit = !!bit;
   u8 = hdr_get8h(&cpkt[6]);
-  u8 &= ~(1<<5);
-  u8 |= bit<<5;
+  u8 &= (uint8_t)~(1<<5);
+  u8 |= (uint8_t)(bit<<5);
   hdr_set8h(&cpkt[6], u8);
 }
 
@@ -1049,8 +1057,8 @@ static inline void ip_set_dont_frag(void *pkt, int bit)
   uint8_t u8;
   bit = !!bit;
   u8 = hdr_get8h(&cpkt[6]);
-  u8 &= ~(1<<6);
-  u8 |= bit<<6;
+  u8 &= (uint8_t)~(1<<6);
+  u8 |= (uint8_t)(bit<<6);
   hdr_set8h(&cpkt[6], u8);
 }
 
@@ -1085,8 +1093,8 @@ static inline void ip_set_rsvd_bit(void *pkt, int bit)
   uint8_t u8;
   bit = !!bit;
   u8 = hdr_get8h(&cpkt[6]);
-  u8 &= ~(1<<7);
-  u8 |= bit<<7;
+  u8 &= (uint8_t)~(1<<7);
+  u8 |= (uint8_t)(bit<<7);
   hdr_set8h(&cpkt[6], u8);
 }
 
@@ -1124,7 +1132,7 @@ static inline void ip46_set_id(void *pkt, uint16_t ipid)
 static inline uint16_t ip_frag_off(const void *pkt)
 {
   const char *cpkt = pkt;
-  return (hdr_get16n(&cpkt[6])&0x1FFF)*8;
+  return (uint16_t)((hdr_get16n(&cpkt[6])&0x1FFF)*8);
 }
 
 static inline void ip_set_frag_off(void *pkt, uint16_t frag_off)
@@ -1137,8 +1145,8 @@ static inline void ip_set_frag_off(void *pkt, uint16_t frag_off)
   }
   frag_off /= 8;
   c6 = (unsigned char)cpkt[6];
-  c6 &= ~0x1F;
-  c6 |= (frag_off>>8) & 0x1F;
+  c6 &= (uint8_t)~0x1F;
+  c6 = (uint8_t)(c6 | ((frag_off>>8) & 0x1F));
   cpkt[6] = (char)c6;
   cpkt[7] = (char)(unsigned char)(frag_off&0xFF);
 }
@@ -1339,7 +1347,7 @@ static inline void tcp_set_ack_on(void *pkt)
 static inline void tcp_set_ack_off(void *pkt)
 {
   char *cpkt = pkt;
-  hdr_set8h(&cpkt[13], hdr_get8h(&cpkt[13]) & ~(1<<4));
+  hdr_set8h(&cpkt[13], (uint8_t)(hdr_get8h(&cpkt[13]) & ~(1<<4)));
 }
 
 static inline int tcp_rst(const void *pkt)
@@ -1483,15 +1491,15 @@ static inline void tcp_set_data_offset(void *pkt, uint8_t data_off)
     abort();
   }
   val = hdr_get8h(&cpkt[12]);
-  val &= ~0xF0;
-  val |= ((data_off/4)<<4);
+  val &= (uint8_t)~0xF0;
+  val |= (uint8_t)(((data_off/4)<<4));
   hdr_set8h(&cpkt[12], val);
 }
 
 static inline uint8_t tcp_data_offset(const void *pkt)
 {
   const char *cpkt = pkt;
-  return (hdr_get8h(&cpkt[12])>>4)*4;
+  return (uint8_t)((hdr_get8h(&cpkt[12])>>4)*4);
 }
 
 struct sack_ts_headers {

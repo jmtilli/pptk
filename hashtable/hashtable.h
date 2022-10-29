@@ -239,8 +239,8 @@ static inline void hash_table_lock_next_bucket(
 {
   if (table->bucket_mutexes)
   {
-    uint32_t bucketmutex1 = (hashval & (table->bucketcnt - 1)) >> table->mutex_shift;
-    uint32_t bucketmutex2 = ((hashval + 1) & (table->bucketcnt - 1)) >> table->mutex_shift;
+    uint32_t bucketmutex1 = (uint32_t)((hashval & (table->bucketcnt - 1)) >> table->mutex_shift);
+    uint32_t bucketmutex2 = (uint32_t)(((hashval + 1) & (table->bucketcnt - 1)) >> table->mutex_shift);
     if (bucketmutex1 != bucketmutex2)
     {
       pthread_mutex_unlock(&table->bucket_mutexes[bucketmutex1]);

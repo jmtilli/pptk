@@ -11,7 +11,7 @@ void ldpfunc(struct packet *pkt, void *userdata)
   struct ldpfunc_userdata *ud = userdata;
   struct ldp_packet pkts[1];
   pkts[0].data = pkt->data;
-  pkts[0].sz = pkt->sz;
+  pkts[0].sz = (uint32_t)pkt->sz;
   ldp_out_inject(ud->outq, pkts, 1);
   allocif_free(ud->intf, pkt);
 }
@@ -21,7 +21,7 @@ void ldpfunc2(struct packet *pkt, void *userdata)
   struct ldpfunc2_userdata *ud = userdata;
   struct ldp_packet pkts[1];
   pkts[0].data = pkt->data;
-  pkts[0].sz = pkt->sz;
+  pkts[0].sz = (uint32_t)pkt->sz;
   if (pkt->direction == PACKET_DIRECTION_UPLINK)
   {
     ldp_out_inject(ud->uloutq, pkts, 1);
@@ -76,9 +76,9 @@ void ldpfunc3flushdl(struct ldpfunc3_userdata *ud)
   for (i = 0; i < ud->dloutcnt; i++)
   {
     ldppkts[i].data = ud->dloutbuf[i]->data;
-    ldppkts[i].sz = ud->dloutbuf[i]->sz;
+    ldppkts[i].sz = (uint32_t)ud->dloutbuf[i]->sz;
   }
-  ldp_out_inject(ud->dloutq, ldppkts, ud->dloutcnt);
+  ldp_out_inject(ud->dloutq, ldppkts, (int)ud->dloutcnt);
   for (i = 0; i < ud->dloutcnt; i++)
   {
     allocif_free(ud->intf, ud->dloutbuf[i]);
@@ -93,9 +93,9 @@ void ldpfunc3flushul(struct ldpfunc3_userdata *ud)
   for (i = 0; i < ud->uloutcnt; i++)
   {
     ldppkts[i].data = ud->uloutbuf[i]->data;
-    ldppkts[i].sz = ud->uloutbuf[i]->sz;
+    ldppkts[i].sz = (uint32_t)ud->uloutbuf[i]->sz;
   }
-  ldp_out_inject(ud->uloutq, ldppkts, ud->uloutcnt);
+  ldp_out_inject(ud->uloutq, ldppkts, (int)ud->uloutcnt);
   for (i = 0; i < ud->uloutcnt; i++)
   {
     allocif_free(ud->intf, ud->uloutbuf[i]);

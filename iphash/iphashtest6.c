@@ -71,7 +71,7 @@ int main(int argc, char **argv)
       {
         tokens = hash.initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint8_t)tokens;
     }
   }
   else if (use_small(&hash))
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
       {
         tokens = hash.initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
       {
         tokens = hash.initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint8_t)tokens;
     }
   }
   else if (use_small(&hash))
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
       {
         tokens = hash.initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else

@@ -28,8 +28,8 @@ static inline uint8_t dns_qr(const void *vdns)
 static inline void dns_set_qr(void *vdns, uint8_t bit)
 {
   unsigned char *cdns = vdns;
-  cdns[2] &= ~(1<<7);
-  cdns[2] |= (!!bit)<<7;
+  cdns[2] &= (uint8_t)~(1<<7);
+  cdns[2] = (uint8_t)(cdns[2] | ((!!bit)<<7));
 }
 #define DNS_OPCODE_QUERY 0
 #define DNS_OPCODE_IQUERY 1
@@ -42,8 +42,8 @@ static inline uint8_t dns_opcode(const void *vdns)
 static inline void dns_set_opcode(void *vdns, uint8_t bits)
 {
   unsigned char *cdns = vdns;
-  cdns[2] &= ~0x78;
-  cdns[2] |= (bits&0xF)<<3;
+  cdns[2] &= (uint8_t)~0x78;
+  cdns[2] = (uint8_t)(cdns[2] | ((bits&0xF)<<3));
 }
 static inline uint8_t dns_aa(const void *vdns)
 {
@@ -53,8 +53,8 @@ static inline uint8_t dns_aa(const void *vdns)
 static inline void dns_set_aa(void *vdns, uint8_t bit)
 {
   unsigned char *cdns = vdns;
-  cdns[2] &= ~(1<<2);
-  cdns[2] |= (!!bit)<<2;
+  cdns[2] &= (uint8_t)~(1<<2);
+  cdns[2] = (uint8_t)(cdns[2] | ((!!bit)<<2));
 }
 static inline uint8_t dns_tc(const void *vdns)
 {
@@ -64,8 +64,8 @@ static inline uint8_t dns_tc(const void *vdns)
 static inline void dns_set_tc(void *vdns, uint8_t bit)
 {
   unsigned char *cdns = vdns;
-  cdns[2] &= ~(1<<1);
-  cdns[2] |= (!!bit)<<1;
+  cdns[2] &= (uint8_t)~(1<<1);
+  cdns[2] = (uint8_t)(cdns[2] | ((!!bit)<<1));
 }
 static inline uint8_t dns_rd(const void *vdns)
 {
@@ -75,8 +75,8 @@ static inline uint8_t dns_rd(const void *vdns)
 static inline void dns_set_rd(void *vdns, uint8_t bit)
 {
   unsigned char *cdns = vdns;
-  cdns[2] &= ~(1<<0);
-  cdns[2] |= (!!bit)<<0;
+  cdns[2] &= (uint8_t)~(1<<0);
+  cdns[2] |= (uint8_t)(cdns[2] | ((!!bit)<<0));
 }
 static inline uint8_t dns_ra(const void *vdns)
 {
@@ -86,8 +86,8 @@ static inline uint8_t dns_ra(const void *vdns)
 static inline void dns_set_ra(void *vdns, uint8_t bit)
 {
   unsigned char *cdns = vdns;
-  cdns[3] &= ~(1<<7);
-  cdns[3] |= (!!bit)<<7;
+  cdns[3] &= (uint8_t)~(1<<7);
+  cdns[3] = (uint8_t)(cdns[3] | ((!!bit)<<7));
 }
 static inline uint8_t dns_z(const void *vdns)
 {
@@ -97,7 +97,7 @@ static inline uint8_t dns_z(const void *vdns)
 static inline void dns_set_z(void *vdns)
 {
   unsigned char *cdns = vdns;
-  cdns[3] &= ~0x70;
+  cdns[3] &= (uint8_t)~0x70;
 }
 static inline uint8_t dns_rcode(const void *vdns)
 {
@@ -107,25 +107,25 @@ static inline uint8_t dns_rcode(const void *vdns)
 static inline void dns_set_rcode(void *vdns, uint8_t bits)
 {
   unsigned char *cdns = vdns;
-  cdns[3] &= ~0x0F;
-  cdns[3] |= (bits&0x0F);
+  cdns[3] &= (uint8_t)~0x0F;
+  cdns[3] = (uint8_t)(cdns[3] | (bits&0x0F));
 }
-static inline uint8_t dns_qdcount(const void *vdns)
+static inline uint16_t dns_qdcount(const void *vdns)
 {
   unsigned const char *cdns = vdns;
   return hdr_get16n(&cdns[4]);
 }
-static inline uint8_t dns_ancount(const void *vdns)
+static inline uint16_t dns_ancount(const void *vdns)
 {
   unsigned const char *cdns = vdns;
   return hdr_get16n(&cdns[6]);
 }
-static inline uint8_t dns_nscount(const void *vdns)
+static inline uint16_t dns_nscount(const void *vdns)
 {
   unsigned const char *cdns = vdns;
   return hdr_get16n(&cdns[8]);
 }
-static inline uint8_t dns_arcount(const void *vdns)
+static inline uint16_t dns_arcount(const void *vdns)
 {
   unsigned const char *cdns = vdns;
   return hdr_get16n(&cdns[10]);

@@ -110,7 +110,7 @@ static void batch_timer_fn(
       {
         tokens = initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
       {
         tokens = initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
       {
         tokens = initial_tokens;
       }
-      e->tokens = tokens;
+      e->tokens = (uint16_t)tokens;
     }
   }
   else

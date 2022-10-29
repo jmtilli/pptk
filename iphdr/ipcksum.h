@@ -21,7 +21,7 @@ static inline uint16_t ip_cksum_postprocess(struct ip_cksum_ctx *ctx)
   {
     sum = (sum & 0xffff) + (sum >> 16);
   }
-  return htons(~sum);
+  return htons((uint16_t)~sum);
 }
 
 static inline void ip_cksum_add16(struct ip_cksum_ctx *ctx, uint16_t val16)
@@ -74,20 +74,28 @@ uint16_t tcp6_cksum_calc(
 static inline uint16_t tcp46_cksum_calc(
   const void *iphdr)
 {
-  uint16_t tcplen = ip46_payload_len(iphdr);
+  int32_t tcplen = ip46_payload_len(iphdr);
   uint16_t iplen = ip46_hdr_len(iphdr);
   const void *tcphdr = ip46_const_payload(iphdr);
+  if (tcplen < 0)
+  {
+    tcplen = 0;
+  }
+  else if (tcplen > UINT16_MAX)
+  {
+    tcplen = UINT16_MAX;
+  }
   if (ip46_proto(iphdr) != 6)
   {
     abort();
   }
   if (ip_version(iphdr) == 4)
   {
-    return tcp_cksum_calc(iphdr, iplen, tcphdr, tcplen);
+    return tcp_cksum_calc(iphdr, iplen, tcphdr, (uint16_t)tcplen);
   }
   else if (ip_version(iphdr) == 6)
   {
-    return tcp6_cksum_calc(iphdr, iplen, tcphdr, tcplen);
+    return tcp6_cksum_calc(iphdr, iplen, tcphdr, (uint16_t)tcplen);
   }
   else
   {
@@ -159,20 +167,28 @@ static inline void tcp6_set_cksum_calc(
 
 static inline void tcp46_set_cksum_calc(void *iphdr)
 {
-  uint16_t tcplen = ip46_payload_len(iphdr);
+  int32_t tcplen = ip46_payload_len(iphdr);
   uint16_t iplen = ip46_hdr_len(iphdr);
   void *tcphdr = ip46_payload(iphdr);
+  if (tcplen < 0)
+  {
+    tcplen = 0;
+  }
+  else if (tcplen > UINT16_MAX)
+  {
+    tcplen = UINT16_MAX;
+  }
   if (ip46_proto(iphdr) != 6)
   {
     abort();
   }
   if (ip_version(iphdr) == 4)
   {
-    tcp_set_cksum_calc(iphdr, iplen, tcphdr, tcplen);
+    tcp_set_cksum_calc(iphdr, iplen, tcphdr, (uint16_t)tcplen);
   }
   else if (ip_version(iphdr) == 6)
   {
-    tcp6_set_cksum_calc(iphdr, iplen, tcphdr, tcplen);
+    tcp6_set_cksum_calc(iphdr, iplen, tcphdr, (uint16_t)tcplen);
   }
   else
   {
@@ -222,14 +238,14 @@ static inline uint16_t ip_update_cksum16(
     old_cksum = (old_cksum & 0xffff) + (old_cksum >> 16);
   }
   old_cksum = (uint16_t)~old_cksum;
-  return old_cksum;
+  return (uint16_t)old_cksum;
 }
 
-static inline uint32_t ip_update_cksum32(
+static inline uint16_t ip_update_cksum32(
   uint16_t old_cksum, uint32_t old32, uint32_t new32)
 {
-  uint16_t new1 = (new32>>16), old1 = (old32>>16);
-  uint16_t new2 = (new32&0xFFFF), old2 = (old32&0xFFFF);
+  uint16_t new1 = (uint16_t)(new32>>16), old1 = (uint16_t)(old32>>16);
+  uint16_t new2 = (uint16_t)(new32&0xFFFF), old2 = (uint16_t)(old32&0xFFFF);
   uint16_t x;
   x = ip_update_cksum16(ip_update_cksum16(old_cksum, old1, new1), old2, new2);
   return x;
@@ -383,9 +399,9 @@ static inline int ip_decr_ttl_cksum_update(void *pkt)
   {
     abort();
   }
-  whole_field_old = (ttl<<8)|proto;
+  whole_field_old = (uint16_t)((ttl<<8)|proto);
   ttl--;
-  whole_field_new = (ttl<<8)|proto;
+  whole_field_new = (uint16_t)((ttl<<8)|proto);
   old_cksum = ip_update_cksum16(old_cksum, whole_field_old, whole_field_new);
   ip_set_hdr_cksum(pkt, old_cksum);
   ip_set_ttl(pkt, ttl);
@@ -398,7 +414,7 @@ static inline void tcp_set_ack_off_cksum_update(void *pkt)
   uint16_t whole_field_old, whole_field_new;
   uint16_t cksum = tcp_cksum(pkt);
   whole_field_old = hdr_get16n(&cpkt[12]);
-  hdr_set8h(&cpkt[13], hdr_get8h(&cpkt[13]) & ~(1<<4));
+  hdr_set8h(&cpkt[13], (uint8_t)(hdr_get8h(&cpkt[13]) & ~(1<<4)));
   whole_field_new = hdr_get16n(&cpkt[12]);
   cksum = ip_update_cksum16(cksum, whole_field_old, whole_field_new);
   tcp_set_cksum(pkt, cksum);
@@ -424,7 +440,7 @@ static inline void tcp_disable_sack_cksum_update(
     if (curoff + 1 == sacklen)
     {
       uint16_t old_val = hdr_get16n(&chdr[curoff]);
-      uint16_t new_val = (old_val & 0xFF) | 0x0100;
+      uint16_t new_val = (uint16_t)((old_val & 0xFF) | 0x0100);
       cksum = ip_update_cksum16(cksum, old_val, new_val);
       hdr_set16n(&chdr[curoff], new_val);
       curoff += 1;
@@ -450,7 +466,7 @@ static inline void tcp_disable_sack_cksum_update(
       uint16_t old_val1 = hdr_get16n(&chdr[curoff - 1]);
       uint16_t old_val2 = hdr_get16n(&chdr[curoff + 1]);
       uint16_t old_val = hdr_get16n(&chdr[curoff]);
-      uint16_t new_val = (old_val & 0xFF) | 0x0100;
+      uint16_t new_val = (uint16_t)((old_val & 0xFF) | 0x0100);
       uint16_t new_val1, new_val2;
       hdr_set16n(&chdr[curoff], new_val);
       new_val1 = hdr_get16n(&chdr[curoff - 1]);

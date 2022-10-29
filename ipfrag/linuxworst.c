@@ -61,11 +61,11 @@ int main(int argc, char **argv)
     ipq_init(&ipq);
     for (i = 0; i < 50000; i += 1)
     {
-      fragment[0].datastart = 8*(rand() % ((65535-14-20-8)/8));
+      fragment[0].datastart = (uint16_t)(8*(rand() % ((65535-14-20-8)/8)));
       fragment[0].datalen = 8;
       //printf("start %d\n", (65535-14-20-8)/8*8 - i);
       fragment[0].pkt = NULL;
-      if (fragment4(&intf, pkt, sz, fragment, 1) != 0)
+      if (fragment4(&intf, pkt, (uint16_t)sz, fragment, 1) != 0)
       {
         abort();
       }
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     ipq_free(&intf, &ipq);
   }
   end = gettime64();
-  printf("%g MPPS\n", pktcnt*1.0/(end-begin));
+  printf("%g MPPS\n", (double)pktcnt*1.0/(double)(end-begin));
 
   ll_alloc_st_free(&st);
   
