@@ -75,7 +75,7 @@ void tcp_rb_explicit_reassctx_free(struct allocif *loc, struct tcp_rb_explicit_r
     struct rbtcppositive *positive;
     rb_tree_delete(&ctx->packet_tree, root);
     positive = CONTAINER_OF(root, struct rbtcppositive, node);
-    allocif_free(loc, CONTAINER_OF(positive, struct packet, rbtcppositive));
+    allocif_free(loc, CONTAINER_OF(positive, struct packet, u.rbtcppositive));
   }
 }
 
@@ -95,7 +95,7 @@ static void repair_after_passthrough(struct allocif *loc,
     if (seq_cmp(positive->last, ctx->last_fed_seq_plus_1) < 0)
     {
       rb_tree_delete(&ctx->packet_tree, node);
-      allocif_free(loc, CONTAINER_OF(positive, struct packet, rbtcppositive));
+      allocif_free(loc, CONTAINER_OF(positive, struct packet, u.rbtcppositive));
     }
     else
     {
@@ -159,7 +159,7 @@ back:
   if (seq_cmp(positive->last, data_last) <= 0 && seq_cmp(positive->first, data_first) >= 0)
   {
     rb_tree_delete(&ctx->packet_tree, node);
-    allocif_free(loc, CONTAINER_OF(positive, struct packet, rbtcppositive));
+    allocif_free(loc, CONTAINER_OF(positive, struct packet, u.rbtcppositive));
     if (mod)
     {
       *mod = 1;
@@ -207,7 +207,7 @@ tcp_rb_explicit_reassctx_fetch(struct tcp_rb_explicit_reassctx *ctx)
   {
     rb_tree_delete(&ctx->packet_tree, node);
     ctx->last_fed_seq_plus_1 = positive->last+1;
-    return CONTAINER_OF(positive, struct packet, rbtcppositive);
+    return CONTAINER_OF(positive, struct packet, u.rbtcppositive);
   }
   return NULL;
 }
@@ -266,8 +266,8 @@ tcp_rb_explicit_reassctx_add(struct allocif *loc,
     uint32_t old_last_fed_seq_plus_1 = ctx->last_fed_seq_plus_1;
     ctx->last_fed_seq_plus_1 = data_last+1;
     repair_after_passthrough(loc, ctx);
-    pkt->rbtcppositive.first = old_last_fed_seq_plus_1;
-    pkt->rbtcppositive.last = data_last;
+    pkt->u.rbtcppositive.first = old_last_fed_seq_plus_1;
+    pkt->u.rbtcppositive.last = data_last;
     return pkt;
   }
   //printf("%u:%u / %u\n", data_first, data_last, ctx->last_fed_seq_plus_1);
@@ -280,9 +280,9 @@ tcp_rb_explicit_reassctx_add(struct allocif *loc,
 #endif
   if (add_data(loc, ctx, data_first, data_last, NULL) != -EEXIST)
   {
-    pkt->rbtcppositive.first = data_first;
-    pkt->rbtcppositive.last = data_last;
-    rb_tree_insert(&ctx->packet_tree, &pkt->rbtcppositive.node);
+    pkt->u.rbtcppositive.first = data_first;
+    pkt->u.rbtcppositive.last = data_last;
+    rb_tree_insert(&ctx->packet_tree, &pkt->u.rbtcppositive.node);
   }
   else
   {

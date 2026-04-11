@@ -89,9 +89,9 @@ struct packet *ip_frag_reassemble(struct allocif *loc, struct ipq *qp)
     ip = ether_payload(pkt->data);
     pay = ip_payload(ip);
     frag_off = ip_frag_off(ip);
-    within_off = pkt->positive.offset - frag_off;
-    memcpy(&pay2[pkt->positive.offset], &pay[within_off], pkt->sz - pkt->positive.pulled);
-    //printf("%d(%d) %d\n", pkt->positive.offset, frag_off, (int)(frag_off + pkt->sz - pkt->positive.pulled));
+    within_off = pkt->u.positive.offset - frag_off;
+    memcpy(&pay2[pkt->u.positive.offset], &pay[within_off], pkt->sz - pkt->u.positive.pulled);
+    //printf("%d(%d) %d\n", pkt->u.positive.offset, frag_off, (int)(frag_off + pkt->sz - pkt->u.positive.pulled));
     pkt = CONTAINER_OF(pkt->node.next, struct packet, node);
   }
   return pkt2;
@@ -111,14 +111,14 @@ int ip_frag_queue(struct allocif *loc, struct ipq *qp, struct packet *pkt)
 	for (next = qp->q.fragments; next != NULL;
              next = CONTAINER_OF(next->node.next, struct packet, node))
 	{
-		printf("%d-%d\n", (int)next->positive.offset,
-		       (int)next->positive.offset +
-		       (int)(next->sz - next->positive.pulled));
+		printf("%d-%d\n", (int)next->u.positive.offset,
+		       (int)next->u.positive.offset +
+		       (int)(next->sz - next->u.positive.pulled));
 	}
 	printf("-------- END QUEUE ---------\n");
 #endif
 
-        pkt->positive.pulled = 0;
+        pkt->u.positive.pulled = 0;
 
         if (qp->q.flags & INET_FRAG_COMPLETE)
 	{
@@ -127,7 +127,7 @@ int ip_frag_queue(struct allocif *loc, struct ipq *qp, struct packet *pkt)
 	}
 
 #if 0
-        if (!(pkt->positive.flags & IPSKB_FRAG_COMPLETE) &&
+        if (!(pkt->u.positive.flags & IPSKB_FRAG_COMPLETE) &&
             (ip_frag_too_far(qp)) &&
             (err = ip_frag_reinit(qp))) {
                 ipq_kill(qp);
@@ -178,21 +178,21 @@ int ip_frag_queue(struct allocif *loc, struct ipq *qp, struct packet *pkt)
 #endif
 
         err = -ENOMEM;
-        pkt->positive.pulled += 14 + ihl;
+        pkt->u.positive.pulled += 14 + ihl;
 
         /* Find out which fragments are in front and at the back of us
          * in the chain of fragments so far.  We must know where to put
          * this fragment, right?
          */
         prev = qp->q.fragments_tail;
-        if (!prev || prev->positive.offset < offset) {
+        if (!prev || prev->u.positive.offset < offset) {
                 next = NULL;
                 goto found;
         }
         prev = NULL;
         for (next = qp->q.fragments; next != NULL;
              next = CONTAINER_OF(next->node.next, struct packet, node)) {
-                if (next->positive.offset >= offset)
+                if (next->u.positive.offset >= offset)
                         break;  /* bingo! */
                 prev = next;
         }
@@ -203,7 +203,7 @@ found:
          * any overlaps are eliminated.
          */
         if (prev) {
-                int i = (int)(prev->positive.offset + prev->sz - prev->positive.pulled) - offset;
+                int i = (int)(prev->u.positive.offset + prev->sz - prev->u.positive.pulled) - offset;
 
                 if (i > 0) {
                         offset += i;
@@ -216,21 +216,21 @@ found:
                                 //goto err;
 			}
                         err = -ENOMEM;
-                        pkt->positive.pulled += i;
+                        pkt->u.positive.pulled += i;
                 }
         }
 
         err = -ENOMEM;
 
-        while (next && next->positive.offset < end) {
-                int i = end - next->positive.offset; /* overlap is 'i' bytes */
+        while (next && next->u.positive.offset < end) {
+                int i = end - next->u.positive.offset; /* overlap is 'i' bytes */
 
-                if (i < (int)(next->sz - next->positive.pulled)) {
+                if (i < (int)(next->sz - next->u.positive.pulled)) {
                         /* Eat head of the next overlapped fragment
                          * and leave the loop. The next ones cannot overlap.
                          */
-                        next->positive.pulled += i;
-                        next->positive.offset += i;
+                        next->u.positive.pulled += i;
+                        next->u.positive.offset += i;
                         qp->q.meat -= i;
                         break;
                 } else {
@@ -246,12 +246,12 @@ found:
                         else
                                 qp->q.fragments = next;
 
-                        qp->q.meat -= (int)(free_it->sz - free_it->positive.pulled);
+                        qp->q.meat -= (int)(free_it->sz - free_it->u.positive.pulled);
                         allocif_free(loc, free_it);
                 }
         }
 
-        pkt->positive.offset = offset;
+        pkt->u.positive.offset = offset;
 
         /* Insert this fragment in the chain of fragments. */
         pkt->node.next = &next->node;
@@ -262,11 +262,11 @@ found:
         else
                 qp->q.fragments = pkt;
 
-        qp->q.meat += (int)pkt->sz - pkt->positive.pulled;
+        qp->q.meat += (int)pkt->sz - pkt->u.positive.pulled;
         if (offset == 0)
                 qp->q.flags |= INET_FRAG_FIRST_IN;
 
-        fragsize = (unsigned)pkt->sz - (unsigned)pkt->positive.pulled + (unsigned)ihl;
+        fragsize = (unsigned)pkt->sz - (unsigned)pkt->u.positive.pulled + (unsigned)ihl;
 
         if (fragsize > qp->q.max_size)
                 qp->q.max_size = fragsize;

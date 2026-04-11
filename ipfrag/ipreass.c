@@ -178,7 +178,7 @@ void reassctx_add(struct reassctx *ctx, struct packet *pkt)
       }
       else
       {
-        struct hole *hole_before = &pkt->hole;
+        struct hole *hole_before = &pkt->u.hole;
         linked_list_add_before(&hole_before->node, &hole->node);
         hole_before->first = hole->first;
         hole_before->last = data_first - 1;

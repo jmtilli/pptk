@@ -42,7 +42,7 @@ struct packet {
     struct rbhole rbhole;
     struct positive positive;
     struct rbtcppositive rbtcppositive;
-  };
+  } u;
   enum packet_direction direction;
   size_t sz;
   void *data;

@@ -332,7 +332,7 @@ void rb_explicit_reassctx_add(struct allocif *loc,
   printf("-----\n");
   printf("first %d last %d\n", data_first, data_last); // FIXME comment out
 #endif
-  add_data(ctx, data_first, data_last, &pkt->rbhole, &mod, &overlap);
+  add_data(ctx, data_first, data_last, &pkt->u.rbhole, &mod, &overlap);
 #ifdef PRINT_TREE
   print_tree(ctx->hole_tree.root);
   printf("-----\n");

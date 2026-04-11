@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     //printf("added pkt\n");
     while (pkt != NULL)
     {
-      cursn = pkt->rbtcppositive.last + 1;
+      cursn = pkt->u.rbtcppositive.last + 1;
       //printf("got pkt %u:%u\n", (uint32_t)pkt->rbtcppositive.first, (uint32_t)pkt->rbtcppositive.last);
       allocif_free(&loc, pkt);
       pkt = tcp_rb_explicit_reassctx_fetch(&ctx);
