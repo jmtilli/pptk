@@ -60,7 +60,7 @@ union timer_skiplist_status {
 	struct {
 		uint16_t state;  /**< Stop, pending, running, config. */
 		int16_t owner;   /**< The lcore that owns the timer. */
-	};
+	} s;
 	uint32_t u32;            /**< To atomic-set status + owner. */
 };
 

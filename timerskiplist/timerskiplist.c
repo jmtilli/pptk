@@ -68,8 +68,8 @@ timer_skiplist_init(struct timer_skiplist *tim)
 {
 	union timer_skiplist_status status;
 
-	status.state = RTE_TIMER_STOP;
-	status.owner = RTE_TIMER_NO_OWNER;
+	status.s.state = RTE_TIMER_STOP;
+	status.s.owner = RTE_TIMER_NO_OWNER;
 	tim->status.u32 = status.u32;
 }
 
@@ -93,17 +93,17 @@ timer_set_config_state(struct priv_timer *priv, struct timer_skiplist *tim,
 		/* timer is running on another core
 		 * or ready to run on local core, exit
 		 */
-		if (prev_status.state == RTE_TIMER_RUNNING &&
+		if (prev_status.s.state == RTE_TIMER_RUNNING &&
 		     tim != priv->running_tim)
 			return -1;
 
 		/* timer is being configured on another core */
-		if (prev_status.state == RTE_TIMER_CONFIG)
+		if (prev_status.s.state == RTE_TIMER_CONFIG)
 			return -1;
 
 		/* here, we know that timer is stopped or pending,
 		 * mark it atomically as being configured */
-		status.state = RTE_TIMER_CONFIG;
+		status.s.state = RTE_TIMER_CONFIG;
 		tim->status.u32 = status.u32;
 		success = 1;
 	}
@@ -127,12 +127,12 @@ timer_set_running_state(struct timer_skiplist *tim)
 		prev_status.u32 = tim->status.u32;
 
 		/* timer is not pending anymore */
-		if (prev_status.state != RTE_TIMER_PENDING)
+		if (prev_status.s.state != RTE_TIMER_PENDING)
 			return -1;
 
 		/* here, we know that timer is stopped or pending,
 		 * mark it atomically as beeing configured */
-		status.state = RTE_TIMER_RUNNING;
+		status.s.state = RTE_TIMER_RUNNING;
 		tim->status.u32 = status.u32;
 		success = 1;
 	}
@@ -308,12 +308,12 @@ __timer_skiplist_reset(struct priv_timer *priv, struct timer_skiplist *tim, uint
 		return -1;
 
 	__TIMER_STAT_ADD(reset, 1);
-	if (prev_status.state == RTE_TIMER_RUNNING) {
+	if (prev_status.s.state == RTE_TIMER_RUNNING) {
 		priv->updated = 1;
 	}
 
 	/* remove it from list */
-	if (prev_status.state == RTE_TIMER_PENDING) {
+	if (prev_status.s.state == RTE_TIMER_PENDING) {
 		timer_skiplist_remove(priv, tim);
 		__TIMER_STAT_ADD(pending, -1);
 	}
@@ -328,7 +328,7 @@ __timer_skiplist_reset(struct priv_timer *priv, struct timer_skiplist *tim, uint
 
 	/* update state: as we are in CONFIG state, only us can modify
 	 * the state so we don't need to use cmpset() here */
-	status.state = RTE_TIMER_PENDING;
+	status.s.state = RTE_TIMER_PENDING;
 	tim->status.u32 = status.u32;
 
 	return 0;
@@ -366,19 +366,19 @@ timer_skiplist_stop(struct priv_timer *priv, struct timer_skiplist *tim)
 		return -1;
 
 	__TIMER_STAT_ADD(stop, 1);
-	if (prev_status.state == RTE_TIMER_RUNNING) {
+	if (prev_status.s.state == RTE_TIMER_RUNNING) {
 		priv->updated = 1;
 	}
 
 	/* remove it from list */
-	if (prev_status.state == RTE_TIMER_PENDING) {
+	if (prev_status.s.state == RTE_TIMER_PENDING) {
 		timer_skiplist_remove(priv, tim);
 		__TIMER_STAT_ADD(pending, -1);
 	}
 
 	/* mark timer as stopped */
-	status.state = RTE_TIMER_STOP;
-	status.owner = RTE_TIMER_NO_OWNER;
+	status.s.state = RTE_TIMER_STOP;
+	status.s.owner = RTE_TIMER_NO_OWNER;
 	tim->status.u32 = status.u32;
 
 	return 0;
@@ -396,7 +396,7 @@ timer_skiplist_stop_sync(struct priv_timer *priv, struct timer_skiplist *tim)
 int
 timer_skiplist_pending(struct timer_skiplist *tim)
 {
-	return tim->status.state == RTE_TIMER_PENDING;
+	return tim->status.s.state == RTE_TIMER_PENDING;
 }
 
 uint64_t timer_skiplist_next_expiry_time(struct priv_timer *priv)
@@ -504,14 +504,14 @@ void timer_skiplist_manage(struct priv_timer *priv, void *threaddata)
 
 		if (tim->period == 0) {
 			/* remove from done list and mark timer as stopped */
-			status.state = RTE_TIMER_STOP;
-			status.owner = RTE_TIMER_NO_OWNER;
+			status.s.state = RTE_TIMER_STOP;
+			status.s.owner = RTE_TIMER_NO_OWNER;
 			tim->status.u32 = status.u32;
 		}
 		else {
 			/* keep it in list and mark timer as pending */
 			//pthread_mutex_lock(&priv->list_lock);
-			status.state = RTE_TIMER_PENDING;
+			status.s.state = RTE_TIMER_PENDING;
 			__TIMER_STAT_ADD(pending, 1);
 			tim->status.u32 = status.u32;
 			__timer_skiplist_reset(priv, tim, tim->time64 + tim->period,
