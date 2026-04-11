@@ -18,9 +18,9 @@ int main(int argc, char **argv)
   char ethersrc[6] = {2,0,0,0,0,1};
   char etherdst[6] = {2,0,0,0,0,2};
   struct ldp_packet pkts[1024];
-  struct ldp_chunkpacket chunkpkts[1024] = {};
-  struct iovec iovs[1024][2] = {};
-  char tunnelhdrs[1024][14+20+4] = {};
+  struct ldp_chunkpacket chunkpkts[1024] = {LDP_CHUNKPACKET_EMPTY};
+  struct iovec iovs[1024][2] = {{{.iov_len=0}}};
+  char tunnelhdrs[1024][14+20+4] = {{0}};
   uint32_t ipsrc = (10<<24)|1;
   uint32_t ipdst = (10<<24)|2;
   void *ether, *ip, *gre;

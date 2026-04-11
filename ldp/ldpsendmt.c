@@ -202,7 +202,7 @@ static void *thrfn(void *arg)
   uint64_t last_time64 = gettime64();
   uint64_t pkts = 0, bytes = 0;
   uint64_t last_pkts = 0, last_bytes = 0;
-  struct ldp_packet pkt_tbl[8192] = {};
+  struct ldp_packet pkt_tbl[8192] = {LDP_PACKET_EMPTY};
   size_t i;
   char pkt[65536] = {0};
 

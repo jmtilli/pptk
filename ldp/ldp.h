@@ -23,6 +23,7 @@ struct ldp_config {
   int odp_pkt_len;
   int pcap_num_bufs;
 };
+#define LDP_CONFIG_EMPTY {.socket_num_bufs=0}
 
 struct ldp_config *ldp_config_get_global(void);
 
@@ -76,6 +77,7 @@ struct ldp_interface_settings {
   int rss_set;
   struct rss_opts rss;
 };
+#define LDP_INTERFACE_SETTINGS_EMPTY {.mtu_set=0}
 
 struct ldp_interface {
   int num_inq;
@@ -106,11 +108,13 @@ struct ldp_packet {
     char ancillarydata[sizeof(void*)];
   } u;
 };
+#define LDP_PACKET_EMPTY {.sz=0}
 
 struct ldp_chunkpacket {
   struct iovec *iov;
   size_t iovlen;
 };
+#define LDP_CHUNKPACKET_EMPTY {.iovlen=0}
 
 struct ldp_in_queue {
   int fd;

@@ -47,7 +47,7 @@ static int turn_off_offloads(const char *name)
   } sset_info;
   struct feature_state *state;
   struct feature_state_set *setstate;
-  struct ifreq ifr = {};
+  struct ifreq ifr = {.ifr_name = ""};
   int fd;
   uint32_t len;
 
@@ -185,7 +185,7 @@ static int check_offloads(const char *name)
     uint32_t buf[1];
   } sset_info;
   struct feature_state *state;
-  struct ifreq ifr = {};
+  struct ifreq ifr = {.ifr_name = ""};
   int fd;
   uint32_t len;
 
@@ -302,7 +302,7 @@ static int check_offloads(const char *name)
 
 
 static int ldp_config_global_isset = 0;
-static struct ldp_config ldp_config_global = {};
+static struct ldp_config ldp_config_global = LDP_CONFIG_EMPTY;
 
 void ldp_config_init(struct ldp_config *config)
 {
@@ -417,7 +417,7 @@ struct ldp_config *ldp_config_get_global(void)
 {
   if (!ldp_config_global_isset)
   {
-    struct ldp_config ldp_config_local = {};
+    struct ldp_config ldp_config_local = LDP_CONFIG_EMPTY;
     ldp_config_init(&ldp_config_local);
     ldp_config_set(&ldp_config_local);
   }

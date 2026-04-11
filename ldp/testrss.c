@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
   struct ldp_interface *intf;
-  struct ldp_interface_settings settings = {};
+  struct ldp_interface_settings settings = LDP_INTERFACE_SETTINGS_EMPTY;
   if (argc != 2)
   {
     printf("Usage: testldp netmap:eth0\n");
