@@ -37,7 +37,7 @@ void log_impl_vlog(enum log_level level, const char *compname, const char *file,
     if (__log_log_level <= atomic_load(&global_log_file_level) || \
         __log_log_level <= atomic_load(&global_log_console_level)) \
     { \
-      log_impl_log(__log_log_level, __log_log_compname, __FILE__, __LINE__, __FUNCTION__, __log_log_buf, ##__VA_ARGS__); \
+      log_impl_log(__log_log_level, __log_log_compname, __FILE__, __LINE__, __func__, __log_log_buf, ##__VA_ARGS__); \
     } \
   } \
   while (0)
