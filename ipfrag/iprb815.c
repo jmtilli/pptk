@@ -52,7 +52,7 @@ void rb815ctx_init(struct rb815ctx *ctx)
 
 void rb815ctx_init_fast(struct rb815ctx *ctx)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   hole.len = 65535;
   hole.left_valid = 0;
   hole.right_valid = 0;
@@ -66,7 +66,7 @@ void rb815ctx_init_fast(struct rb815ctx *ctx)
 
 static inline uint16_t get_sibling_loc(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   uint16_t parent_loc;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   if (!hole.parent_valid)
@@ -89,7 +89,7 @@ static inline uint16_t get_sibling_loc(struct rb815ctx *ctx, uint16_t loc)
 static inline uint16_t
 get_sibling_loc_parent(struct rb815ctx *ctx, uint16_t loc, uint16_t parent_loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   if (parent_loc == RB815_HOLE_NULL)
   {
     return RB815_HOLE_NULL;
@@ -111,7 +111,7 @@ get_sibling_loc_parent(struct rb815ctx *ctx, uint16_t loc, uint16_t parent_loc)
 
 static int rb815_subtree_ptrs_valid(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {}, left = {}, right = {};
+  struct rb815hole hole = RB815HOLE_EMPTY, left = RB815HOLE_EMPTY, right = RB815HOLE_EMPTY;
   int resultl = 0, resultr = 0;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   if (hole.left_valid)
@@ -149,7 +149,7 @@ static int rb815_subtree_ptrs_valid(struct rb815ctx *ctx, uint16_t loc)
 
 static __attribute__((unused)) int rb815_tree_ptrs_valid(struct rb815ctx *ctx)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   if (ctx->root_hole == RB815_HOLE_NULL)
   { 
     return 1;
@@ -593,7 +593,7 @@ exchange(struct rb815ctx *ctx, uint16_t n1_loc, uint16_t n2_loc)
 
 static inline uint16_t get_uncle_loc(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   if (!hole.parent_valid)
   {
@@ -604,17 +604,17 @@ static inline uint16_t get_uncle_loc(struct rb815ctx *ctx, uint16_t loc)
 
 static inline void rotate_left(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   uint16_t parent_loc;
-  struct rb815hole parent = {};
+  struct rb815hole parent = RB815HOLE_EMPTY;
   uint16_t q_loc;
-  struct rb815hole q = {};
+  struct rb815hole q = RB815HOLE_EMPTY;
   uint16_t a_loc;
-  struct rb815hole a = {};
+  struct rb815hole a = RB815HOLE_EMPTY;
   uint16_t b_loc;
-  struct rb815hole b = {};
+  struct rb815hole b = RB815HOLE_EMPTY;
   uint16_t c_loc;
-  struct rb815hole c = {};
+  struct rb815hole c = RB815HOLE_EMPTY;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   parent_loc = hole.parent_valid ? (hole.parent_div_8 * 8) : RB815_HOLE_NULL;
   if (parent_loc != RB815_HOLE_NULL)
@@ -715,17 +715,17 @@ static inline void rotate_left(struct rb815ctx *ctx, uint16_t loc)
 
 static inline void rotate_right(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   uint16_t parent_loc;
-  struct rb815hole parent = {};
+  struct rb815hole parent = RB815HOLE_EMPTY;
   uint16_t p_loc;
-  struct rb815hole p = {};
+  struct rb815hole p = RB815HOLE_EMPTY;
   uint16_t a_loc;
-  struct rb815hole a = {};
+  struct rb815hole a = RB815HOLE_EMPTY;
   uint16_t b_loc;
-  struct rb815hole b = {};
+  struct rb815hole b = RB815HOLE_EMPTY;
   uint16_t c_loc;
-  struct rb815hole c = {};
+  struct rb815hole c = RB815HOLE_EMPTY;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   parent_loc = hole.parent_valid ? (hole.parent_div_8 * 8) : RB815_HOLE_NULL;
   if (parent_loc != RB815_HOLE_NULL)
@@ -836,14 +836,14 @@ static inline void rotate_right(struct rb815ctx *ctx, uint16_t loc)
 
 static void rb815_tree_insert_repair(struct rb815ctx *ctx, uint16_t loc)
 {
-  struct rb815hole hole = {};
+  struct rb815hole hole = RB815HOLE_EMPTY;
   uint16_t parent_loc;
-  struct rb815hole parent = {};
+  struct rb815hole parent = RB815HOLE_EMPTY;
   uint16_t uncle_loc;
-  struct rb815hole uncle = {};
+  struct rb815hole uncle = RB815HOLE_EMPTY;
   uint16_t grandparent_loc;
-  struct rb815hole grandparent = {};
-  struct rb815hole gpl = {}, gpr = {};
+  struct rb815hole grandparent = RB815HOLE_EMPTY;
+  struct rb815hole gpl = RB815HOLE_EMPTY, gpr = RB815HOLE_EMPTY;
   memcpy(&hole, &ctx->pkt[loc], sizeof(hole));
   if (!hole.parent_valid)
   {
@@ -1087,8 +1087,8 @@ delete_case4(struct rb815ctx *ctx, uint16_t loc, uint16_t parent_loc)
   struct rb815hole s;
   uint16_t s_left_loc = RB815_HOLE_NULL;
   uint16_t s_right_loc = RB815_HOLE_NULL;
-  struct rb815hole s_left = {};
-  struct rb815hole s_right = {};
+  struct rb815hole s_left = RB815HOLE_EMPTY;
+  struct rb815hole s_right = RB815HOLE_EMPTY;
   struct rb815hole parent;
   memcpy(&parent, &ctx->pkt[parent_loc], sizeof(parent));
   if (s_loc != RB815_HOLE_NULL)
@@ -1131,8 +1131,8 @@ delete_case3(struct rb815ctx *ctx, uint16_t loc, uint16_t parent_loc)
   struct rb815hole s;
   uint16_t s_left_loc = RB815_HOLE_NULL;
   uint16_t s_right_loc = RB815_HOLE_NULL;
-  struct rb815hole s_left = {};
-  struct rb815hole s_right = {};
+  struct rb815hole s_left = RB815HOLE_EMPTY;
+  struct rb815hole s_right = RB815HOLE_EMPTY;
   struct rb815hole parent;
   memcpy(&parent, &ctx->pkt[parent_loc], sizeof(parent));
   if (s_loc != RB815_HOLE_NULL)
@@ -1428,7 +1428,7 @@ back:
   }
   if (loc + hole.len - 1 > data_last && loc < data_first)
   {
-    struct rb815hole new_hole = {};
+    struct rb815hole new_hole = RB815HOLE_EMPTY;
     uint16_t new_loc;
     new_loc = data_last + 1;
     // new_hole->last = hole->last

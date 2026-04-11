@@ -31,6 +31,7 @@ struct ll_alloc_st {
   size_t size;
   size_t native_size;
 };
+#define LL_ALLOC_ST_EMPTY {.size=0}
 
 int ll_alloc_st_init(
   struct ll_alloc_st *st, size_t capacity, size_t native_size);

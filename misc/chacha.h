@@ -33,8 +33,8 @@ static inline void chacha20_init_deterministic(
 static inline int chacha20_init_devrandom(
   struct chacha20_ctx *ctx)
 {
-  char key[32] = {};
-  char nonce[12] = {};
+  char key[32] = {0};
+  char nonce[12] = {0};
   FILE *f;
   f = fopen("/dev/urandom", "r");
   if (f == NULL)

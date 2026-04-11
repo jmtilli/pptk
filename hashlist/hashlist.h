@@ -11,6 +11,7 @@ struct hash_list_node {
 struct hash_list_head {
   struct hash_list_node *next;
 };
+#define HASH_LIST_HEAD_EMPTY {.next=NULL}
 
 static inline void hash_list_head_init(struct hash_list_head *head)
 {

@@ -22,7 +22,7 @@ static void periodic_fn(
 
 int main(int argc, char **argv)
 {
-  struct priv_timer priv = {};
+  struct priv_timer priv = PRIV_TIMER_EMPTY;
   struct periodud periodics_ud[50];
   struct timer_skiplist periodics[50];
   size_t i;

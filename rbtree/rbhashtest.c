@@ -12,11 +12,13 @@ struct hash_sip_entry {
   struct hash_list_node node;
   uint32_t key;
 };
+#define HASH_SIP_ENTRY_EMPTY {.key=0}
 
 struct hash_rb_entry {
   struct rb_tree_node node;
   uint32_t key;
 };
+#define HASH_RB_ENTRY_EMPTY {.key=0}
 
 static inline uint32_t murmur_weak(uint32_t key)
 {
@@ -72,10 +74,10 @@ static inline uint32_t siphash_strong(uint32_t key)
   return siphash64(secret, key);
 }
 
-struct hash_list_head bucketssip[NUM] = {};
-struct rb_tree_nocmp bucketsrb[NUM] = {};
-struct hash_sip_entry entriessip[NUM] = {};
-struct hash_rb_entry entriesrb[NUM] = {};
+struct hash_list_head bucketssip[NUM] = {HASH_LIST_HEAD_EMPTY};
+struct rb_tree_nocmp bucketsrb[NUM] = {RB_TREE_NOCMP_EMPTY};
+struct hash_sip_entry entriessip[NUM] = {HASH_SIP_ENTRY_EMPTY};
+struct hash_rb_entry entriesrb[NUM] = {HASH_RB_ENTRY_EMPTY};
 
 int main(int argc, char **argv)
 {

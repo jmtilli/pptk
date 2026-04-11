@@ -95,6 +95,7 @@ struct priv_timer {
         /** running timer on this lcore now */
         struct timer_skiplist *running_tim;
 };
+#define PRIV_TIMER_EMPTY {.updated=0}
 
 
 /**

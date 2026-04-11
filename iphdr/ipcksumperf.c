@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv)
 {
-  char buf[1500] = {};
+  char buf[1500] = {0};
   size_t i;
   struct timeval tv1, tv2;
   double diff;

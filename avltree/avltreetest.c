@@ -110,7 +110,7 @@ void print_tree(struct avl_tree *tree)
 
 int main(int argc, char **argv)
 {
-  struct avl_tree tree = {};
+  struct avl_tree tree = AVL_TREE_EMPTY;
   int i;
   avl_tree_init(&tree, cmp, NULL);
   for (i = 0; i < 1000*1000; i++)

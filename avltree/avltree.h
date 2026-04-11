@@ -15,6 +15,7 @@ struct avl_tree {
   avl_tree_cmp cmp;
   void *cmp_userdata;
 };
+#define AVL_TREE_EMPTY {.cmp_userdata=(void*)0}
 
 static inline void avl_tree_init(struct avl_tree *tree, avl_tree_cmp cmp, void *cmp_userdata)
 {

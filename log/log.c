@@ -30,11 +30,11 @@ struct globals {
 struct globals globals = {
   .mtx = PTHREAD_MUTEX_INITIALIZER,
   .last_time64 = 0,
-  .burst = {},
+  .burst = {0},
   .increment = 1000,
   .max = 1000,
   .interval = 1000*1000,
-  .missed_events = {},
+  .missed_events = {0},
   .max_size = 256*1024*1024,
 };
 

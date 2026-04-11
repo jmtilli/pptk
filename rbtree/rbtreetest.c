@@ -261,7 +261,7 @@ static void insperf2(struct rb_tree_nocmp *tree)
 
 static void nocmptest(void)
 {
-  struct rb_tree_nocmp tree = {};
+  struct rb_tree_nocmp tree = RB_TREE_NOCMP_EMPTY;
   int val;
   rb_tree_nocmp_init(&tree);
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 2) != NULL)
@@ -451,7 +451,7 @@ static void nocmptest(void)
 
 int main(int argc, char **argv)
 {
-  struct rb_tree tree = {};
+  struct rb_tree tree = RB_TREE_EMPTY;
   int i;
   rb_tree_init(&tree, cmp, NULL);
   for (i = 0; i < 1000*1000; i++)

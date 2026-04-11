@@ -16,12 +16,14 @@ typedef int (*rb_tree_cmp_asym)(const void *a, struct rb_tree_node *b, void *ud)
 struct rb_tree_nocmp {
   struct rb_tree_node *root;
 };
+#define RB_TREE_NOCMP_EMPTY {.root=(struct rb_tree_node*)0}
 
 struct rb_tree {
   struct rb_tree_nocmp nocmp;
   rb_tree_cmp cmp;
   void *cmp_userdata;
 };
+#define RB_TREE_EMPTY {.cmp_userdata=(void*)0}
 
 static inline void rb_tree_nocmp_init(struct rb_tree_nocmp *tree)
 {

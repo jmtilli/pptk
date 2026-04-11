@@ -21,6 +21,7 @@ struct rb815hole {
   uint16_t is_black:1;
   uint16_t spare3:1;
 };
+#define RB815HOLE_EMPTY {.len=0}
 
 #define RB815_HOLE_NULL (65535)
 

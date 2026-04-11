@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv)
 {
-  struct ll_alloc_st st = {};
+  struct ll_alloc_st st = LL_ALLOC_ST_EMPTY;
   struct allocif intf = {.ops = &ll_allocif_ops_st, .userdata = &st};
   void *block;
   int i;
