@@ -133,22 +133,22 @@ static inline uint8_t dns_arcount(const void *vdns)
 static inline void dns_set_qdcount(void *vdns, uint16_t val)
 {
   unsigned char *cdns = vdns;
-  return hdr_set16n(&cdns[4], val);
+  hdr_set16n(&cdns[4], val);
 }
 static inline void dns_set_ancount(void *vdns, uint16_t val)
 {
   unsigned char *cdns = vdns;
-  return hdr_set16n(&cdns[6], val);
+  hdr_set16n(&cdns[6], val);
 }
 static inline void dns_set_nscount(void *vdns, uint16_t val)
 {
   unsigned char *cdns = vdns;
-  return hdr_set16n(&cdns[8], val);
+  hdr_set16n(&cdns[8], val);
 }
 static inline void dns_set_arcount(void *vdns, uint16_t val)
 {
   unsigned char *cdns = vdns;
-  return hdr_set16n(&cdns[10], val);
+  hdr_set16n(&cdns[10], val);
 }
 
 static inline void dns_next_init_an(void *vdns, uint16_t *off, uint16_t *remcnt)

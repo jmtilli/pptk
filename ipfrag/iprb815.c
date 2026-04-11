@@ -876,7 +876,8 @@ static void rb815_tree_insert_repair(struct rb815ctx *ctx, uint16_t loc)
       memcpy(&ctx->pkt[parent_loc], &parent, sizeof(parent));
       memcpy(&ctx->pkt[uncle_loc], &uncle, sizeof(uncle));
       memcpy(&ctx->pkt[grandparent_loc], &grandparent, sizeof(grandparent));
-      return rb815_tree_insert_repair(ctx, grandparent_loc); // Tail rec.
+      rb815_tree_insert_repair(ctx, grandparent_loc); // Tail rec.
+      return;
     }
   }
 

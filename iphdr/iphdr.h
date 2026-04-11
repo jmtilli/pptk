@@ -1271,13 +1271,13 @@ static inline uint32_t ip_dst(const void *pkt)
 static inline void ip_set_src(void *pkt, uint32_t src)
 {
   char *cpkt = pkt;
-  return hdr_set32n(&cpkt[12], src);
+  hdr_set32n(&cpkt[12], src);
 }
 
 static inline void ip_set_dst(void *pkt, uint32_t dst)
 {
   char *cpkt = pkt;
-  return hdr_set32n(&cpkt[16], dst);
+  hdr_set32n(&cpkt[16], dst);
 }
 
 static inline void *ip_payload(void *pkt)
@@ -1423,7 +1423,7 @@ static inline uint16_t udp_total_len(const void *pkt)
 static inline void udp_set_total_len(void *pkt, uint16_t total_len)
 {
   char *cpkt = pkt;
-  return hdr_set16n(&cpkt[4], total_len);
+  hdr_set16n(&cpkt[4], total_len);
 }
 
 static inline uint16_t udp_cksum(const void *pkt)
