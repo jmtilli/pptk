@@ -104,7 +104,7 @@ struct ldp_packet {
     size_t ancillarysz;
     void *ancillaryptr;
     char ancillarydata[sizeof(void*)];
-  };
+  } u;
 };
 
 struct ldp_chunkpacket {

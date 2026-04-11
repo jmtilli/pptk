@@ -150,9 +150,9 @@ static void ldp_in_queue_deallocate_some_netmap(struct ldp_in_queue *inq,
   for (i = 0; i < num; i++)
   {
     struct netmap_slot *slot = rxring->slot + next_head;
-    if (slot->buf_idx != pkts[i].ancillary)
+    if (slot->buf_idx != pkts[i].u.ancillary)
     {
-      slot->buf_idx = pkts[i].ancillary;
+      slot->buf_idx = pkts[i].u.ancillary;
       slot->flags |= NS_BUF_CHANGED;
     }
     next_head = nm_ring_next(rxring, next_head);
@@ -177,7 +177,7 @@ static int ldp_in_queue_nextpkts_netmap(struct ldp_in_queue *inq,
     char *buf = NETMAP_BUF(rxring, slot->buf_idx);
     pkts[i].data = buf;
     pkts[i].sz = slot->len;
-    pkts[i].ancillary = slot->buf_idx;
+    pkts[i].u.ancillary = slot->buf_idx;
     i++;
   }
   rxring->cur = cur;

@@ -239,7 +239,7 @@ ldp_in_queue_deallocate_some_pcap(struct ldp_in_queue *inq,
   for (i = 0; i < num; i++)
   {
     inpcap->bufs[new_end] = pkts[i].data;
-    inpcap->bufcapacities[new_end] = pkts[i].ancillarysz;
+    inpcap->bufcapacities[new_end] = pkts[i].u.ancillarysz;
     new_end++;
     if (new_end >= inpcap->num_bufs)
     {
@@ -291,7 +291,7 @@ static void ldp_in_queue_intern(struct ldp_in_queue_pcap *inq,
   memcpy(inq->bufs[inq->buf_start], buf, min);
   pkt->data = inq->bufs[inq->buf_start];
   pkt->sz = min;
-  pkt->ancillarysz = inq->bufcapacities[inq->buf_start];
+  pkt->u.ancillarysz = inq->bufcapacities[inq->buf_start];
   inq->buf_start++;
   if (inq->buf_start >= inq->num_bufs)
   {

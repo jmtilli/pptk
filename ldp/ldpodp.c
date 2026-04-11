@@ -273,7 +273,7 @@ ldp_in_queue_deallocate_some_odp(struct ldp_in_queue *inq,
   for (i = 0; i < num; i++)
   {
     odp_packet_t pkt;
-    memcpy(&pkt, pkts[i].ancillarydata, sizeof(pkt));
+    memcpy(&pkt, pkts[i].u.ancillarydata, sizeof(pkt));
     odp_packet_free(pkt);
   }
 }
@@ -309,7 +309,7 @@ static int ldp_in_queue_nextpkts_odp(struct ldp_in_queue *inq,
     odp_packet_t mbuf = local_pkts[i];
     pkts[i].data = odp_packet_data(mbuf);
     pkts[i].sz = odp_packet_len(mbuf);
-    memcpy(pkts[i].ancillarydata, &mbuf, sizeof(mbuf));
+    memcpy(pkts[i].u.ancillarydata, &mbuf, sizeof(mbuf));
     //printf("packet received by DPDK, len %zu\n", pkts[i].sz);
   }
   return nb_rx;
@@ -466,7 +466,7 @@ static int ldp_out_queue_inject_dealloc_odp(struct ldp_in_queue *inq,
 
   for (i = 0; i < num; i++)
   {
-    memcpy(&tx_mbufs[i], packets[i].ancillarydata, sizeof(tx_mbufs[i]));
+    memcpy(&tx_mbufs[i], packets[i].u.ancillarydata, sizeof(tx_mbufs[i]));
   }
 
   return odp_pktout_send(outodpq->odpq, tx_mbufs, num);

@@ -155,7 +155,7 @@ ldp_in_queue_deallocate_some_dpdk(struct ldp_in_queue *inq,
   int i;
   for (i = 0; i < num; i++)
   {
-    rte_pktmbuf_free(pkts[i].ancillaryptr);
+    rte_pktmbuf_free(pkts[i].u.ancillaryptr);
   }
 }
 
@@ -183,7 +183,7 @@ static int ldp_in_queue_nextpkts_dpdk(struct ldp_in_queue *inq,
       struct rte_mbuf *mbuf = indpdkq->cache[i];
       pkts[i].data = rte_pktmbuf_mtod(mbuf, char *);
       pkts[i].sz = rte_pktmbuf_pkt_len(mbuf);
-      pkts[i].ancillaryptr = mbuf;
+      pkts[i].u.ancillaryptr = mbuf;
     }
     for (i = max_num; i < amnt_cache; i++)
     {
@@ -211,7 +211,7 @@ static int ldp_in_queue_nextpkts_dpdk(struct ldp_in_queue *inq,
     struct rte_mbuf *mbuf = local_pkts[i];
     pkts[i].data = rte_pktmbuf_mtod(mbuf, char *);
     pkts[i].sz = rte_pktmbuf_pkt_len(mbuf);
-    pkts[i].ancillaryptr = mbuf;
+    pkts[i].u.ancillaryptr = mbuf;
     //printf("packet received by DPDK, len %zu\n", pkts[i].sz);
   }
   for (i = nb_rx2; i < nb_rx; i++)
@@ -355,7 +355,7 @@ static int ldp_out_queue_inject_dealloc_dpdk(struct ldp_in_queue *inq,
   struct rte_mbuf *tx_mbufs[num];
   for (i = 0; i < num; i++)
   {
-    tx_mbufs[i] = packets[i].ancillaryptr;
+    tx_mbufs[i] = packets[i].u.ancillaryptr;
   }
 
   ret = rte_eth_tx_burst(outdpdkq->port->portid, outdpdkq->qid,
