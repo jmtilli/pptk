@@ -55,6 +55,6 @@ static inline void hash_list_add_head(
   for (x = (head)->next; x; x = x->next)
 
 #define HASH_LIST_FOR_EACH_SAFE(x, n, head) \
-  for (x = (head)->next; x && ({n = x->next; 1;}); x = n)
+  for (x = (head)->next; x && ((n = x->next) || 1); x = n)
 
 #endif
