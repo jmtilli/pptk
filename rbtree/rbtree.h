@@ -11,6 +11,7 @@ struct rb_tree_node {
 };
 
 typedef int (*rb_tree_cmp)(struct rb_tree_node *a, struct rb_tree_node *b, void *ud);
+typedef int (*rb_tree_cmp_asym)(const void *a, struct rb_tree_node *b, void *ud);
 
 struct rb_tree_nocmp {
   struct rb_tree_node *root;
@@ -111,6 +112,29 @@ static inline void rb_tree_delete(struct rb_tree *tree, struct rb_tree_node *nod
 static inline struct rb_tree_node *rb_tree_nocmp_find(
   struct rb_tree_nocmp *tree, rb_tree_cmp cmp, void *cmp_userdata,
   struct rb_tree_node *tofind)
+{
+  struct rb_tree_node *node = tree->root;
+  while (node != NULL)
+  {
+    int res = cmp(tofind, node, cmp_userdata);
+    if (res < 0)
+    {
+      node = node->left;
+    }
+    else if (res > 0)
+    {
+      node = node->right;
+    }
+    else
+    {
+      break;
+    }
+  }
+  return node;
+}
+static inline struct rb_tree_node *rb_tree_nocmp_find_asym(
+  const struct rb_tree_nocmp *tree, rb_tree_cmp_asym cmp, void *cmp_userdata,
+  const void *tofind)
 {
   struct rb_tree_node *node = tree->root;
   while (node != NULL)

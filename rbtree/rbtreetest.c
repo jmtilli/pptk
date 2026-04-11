@@ -144,6 +144,20 @@ static inline int cmp_asym(int i, struct rb_tree_node *n, void *ud)
   }
   return 0;
 }
+static inline int cmp_asym_void(const void *vi, struct rb_tree_node *n, void *ud)
+{
+  const int *i = vi;
+  struct test_entry *e2 = CONTAINER_OF(n, struct test_entry, node);
+  if (*i > e2->i)
+  {
+    return 1;
+  }
+  if (*i < e2->i)
+  {
+    return -1;
+  }
+  return 0;
+}
 
 static int insert_deterministic(struct rb_tree_nocmp *tree, int i)
 {
@@ -186,6 +200,18 @@ static void findperf2(struct rb_tree_nocmp *tree)
   for (i = 0; i < 10*1000*1000; i++)
   {
     if (RB_TREE_NOCMP_FIND(tree, cmp_asym, NULL, 4) != NULL)
+    {
+      printf("err\n");
+      abort();
+    }
+  }
+  end = gettime64();
+  printf("%g MPPS\n", 1e7/(end-begin));
+  begin = gettime64();
+  for (i = 0; i < 10*1000*1000; i++)
+  {
+    int val = 4;
+    if (rb_tree_nocmp_find_asym(tree, cmp_asym_void, NULL, &val) != NULL)
     {
       printf("err\n");
       abort();
@@ -236,8 +262,15 @@ static void insperf2(struct rb_tree_nocmp *tree)
 static void nocmptest(void)
 {
   struct rb_tree_nocmp tree = {};
+  int val;
   rb_tree_nocmp_init(&tree);
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 2) != NULL)
+  {
+    printf("1\n");
+    abort();
+  }
+  val = 2;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) != NULL)
   {
     printf("1\n");
     abort();
@@ -302,7 +335,19 @@ static void nocmptest(void)
     printf("2\n");
     abort();
   }
+  val = 43;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 23) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
+  val = 23;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
   {
     printf("2\n");
     abort();
@@ -312,7 +357,19 @@ static void nocmptest(void)
     printf("2\n");
     abort();
   }
+  val = 5;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 97) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
+  val = 97;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
   {
     printf("2\n");
     abort();
@@ -322,12 +379,30 @@ static void nocmptest(void)
     printf("2\n");
     abort();
   }
+  val = 22;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 30) == NULL)
   {
     printf("2\n");
     abort();
   }
+  val = 30;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
   if (RB_TREE_NOCMP_FIND(&tree, cmp_asym, NULL, 79) == NULL)
+  {
+    printf("2\n");
+    abort();
+  }
+  val = 79;
+  if (rb_tree_nocmp_find_asym(&tree, cmp_asym_void, NULL, &val) == NULL)
   {
     printf("2\n");
     abort();

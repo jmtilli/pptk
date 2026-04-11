@@ -36,6 +36,20 @@ static inline int cmp_asym(uint32_t i1, struct rb_tree_node *n2, void *ud)
   }
   return 0;
 }
+static inline int cmp_asym_void(const void *vi1, struct rb_tree_node *n2, void *ud)
+{
+  const uint32_t *i1 = vi1;
+  struct hash_rb_entry *e2 = CONTAINER_OF(n2, struct hash_rb_entry, node);
+  if (*i1 > e2->key)
+  {
+    return 1;
+  }
+  if (*i1 < e2->key)
+  {
+    return -1;
+  }
+  return 0;
+}
 
 static int cmp(struct rb_tree_node *n1, struct rb_tree_node *n2, void *ud)
 {
@@ -112,6 +126,20 @@ int main(int argc, char **argv)
     uint32_t hashval = murmur_weak(i+NUM);
     entriesrb[i].key = i;
     if (RB_TREE_NOCMP_FIND(&bucketsrb[hashval%NUM], cmp_asym, NULL, i + NUM) != NULL)
+    {
+      abort();
+    }
+  }
+  end = gettime64();
+  printf("rb-find %g us\n", (double)(end - begin));
+  begin = gettime64();
+  for (j = 0; j < 1048576/NUM; j++)
+  for (i = 0; i < NUM; i++)
+  {
+    uint32_t hashval = murmur_weak(i+NUM);
+    uint32_t iplusNUM = i+NUM;
+    entriesrb[i].key = i;
+    if (rb_tree_nocmp_find_asym(&bucketsrb[hashval%NUM], cmp_asym_void, NULL, &iplusNUM) != NULL)
     {
       abort();
     }
